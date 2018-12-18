@@ -16,6 +16,7 @@ for name in folder_names:
 
 # move file to right place
 for filename in listdir(data_folder):
+    print(filename)
     if isfile(filename):
         if filename.endswith(".jpg"):
             rename(join(data_folder,filename),join(data_folder,"JPEGImages",filename))
