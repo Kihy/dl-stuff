@@ -9,8 +9,10 @@ data_folder="dataset/fire_1720"
 folder_names=["JPEGImages", "ImageSets", "Annotations","ImageSets/Main"]
 # make folders
 for name in folder_names:
-    if not isdir(join(data_folder,name)):
-        mkdir(join(data_folder,name))
+    folder=join(data_folder,name)
+    if not isdir(folder):
+        print("creating directory: "+folder)
+        mkdir(folder)
 
 # move file to right place
 for filename in listdir(data_folder):
