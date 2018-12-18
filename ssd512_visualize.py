@@ -77,9 +77,9 @@ fire_val = os.path.join(fire_imagesets, 'val.txt')
 classes = (loads(params["classes"]))
 
 
-val_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_test_path"], filenames=[fire_test])
+val_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_test_path"], filenames=fire_test)
 
-train_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_train_path"], filenames=[fire_train])
+train_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_train_path"], filenames=fire_train)
 
 # train_dataset.parse_xml(images_dirs=[fire_img],
 #                         image_set_filenames=[fire_train],
