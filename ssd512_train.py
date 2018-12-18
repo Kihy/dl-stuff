@@ -30,7 +30,7 @@ params = parser["ssd512_train"]
 classes = (loads(params["classes"]))
 
 img_height = int(params["image_height"])  # Height of the model input images
-img_width = int(params["img_width"])  # Width of the model input images
+img_width = int(params["image_width"])  # Width of the model input images
 img_channels = int(params["img_channels"])  # Number of color channels of the model input images
 # The per-channel mean of the images in the dataset.
 # Do not change this value if you're using any of the pre-trained weights.
