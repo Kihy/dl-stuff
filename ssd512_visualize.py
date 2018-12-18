@@ -144,8 +144,16 @@ data_generator = train_dataset.generate(batch_size=train_batch_size,
 
 # 2: Generate samples.
 
+# Get the number of samples in the training and validations datasets.
+train_dataset_size = train_dataset.get_dataset_size()
+val_dataset_size = val_dataset.get_dataset_size()
+
+print("Number of images in the training dataset:\t{:>6}".format(train_dataset_size))
+print("Number of images in the validation dataset:\t{:>6}".format(val_dataset_size))
+
 batch_images, batch_filenames, batch_inverse_transforms, batch_original_images, batch_original_labels = next(
     predict_generator)
+
 
 for i in range(val_dataset.get_dataset_size()):
     print("Image:", batch_filenames[i])
