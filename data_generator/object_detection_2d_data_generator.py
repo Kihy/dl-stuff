@@ -153,7 +153,7 @@ class DataGenerator:
             if isinstance(filenames, (list, tuple)):
                 self.filenames = filenames
             elif isinstance(filenames, str):
-                with open(filenames, 'rb') as f:
+                with open(filenames, 'r') as f:
                     if filenames_type == 'pickle':
                         self.filenames = pickle.load(f)
                     elif filenames_type == 'text':
