@@ -77,9 +77,9 @@ fire_val = os.path.join(fire_imagesets, 'val.txt')
 classes = (loads(params["classes"]))
 
 
-val_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_test_path"], filenames=fire_test)
+test_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_test_path"], images_dir=fire_img, filenames=fire_test)
 
-train_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_train_path"], filenames=fire_train)
+train_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_train_path"], images_dir=fire_img, filenames=fire_train)
 
 # train_dataset.parse_xml(images_dirs=[fire_img],
 #                         image_set_filenames=[fire_train],
@@ -122,16 +122,16 @@ predictor_sizes = get_predictor_sizes(model)
 
 # 1: Set the generator for the predictions.
 
-predict_generator = val_dataset.generate(batch_size=val_dataset.get_dataset_size(),
-                                         shuffle=True,
-                                         transformations=val_preprocessing(img_height, img_width),
-                                         label_encoder=None,
-                                         returns={'processed_images',
+predict_generator = test_dataset.generate(batch_size=test_dataset.get_dataset_size(),
+                                          shuffle=True,
+                                          transformations=val_preprocessing(img_height, img_width),
+                                          label_encoder=None,
+                                          returns={'processed_images',
                                                   'filenames',
                                                   'inverse_transform',
                                                   'original_images',
                                                   'original_labels'},
-                                         keep_images_without_gt=False)
+                                          keep_images_without_gt=False)
 train_batch_size = int(params["train_size"])
 data_generator = train_dataset.generate(batch_size=train_batch_size,
                                         shuffle=True,
@@ -148,7 +148,7 @@ data_generator = train_dataset.generate(batch_size=train_batch_size,
 
 # Get the number of samples in the training and validations datasets.
 train_dataset_size = train_dataset.get_dataset_size()
-val_dataset_size = val_dataset.get_dataset_size()
+val_dataset_size = test_dataset.get_dataset_size()
 
 print("Number of images in the training dataset:\t{:>6}".format(train_dataset_size))
 print("Number of images in the validation dataset:\t{:>6}".format(val_dataset_size))
@@ -157,7 +157,7 @@ batch_images, batch_filenames, batch_inverse_transforms, batch_original_images, 
     predict_generator)
 
 print(batch_filenames)
-for i in range(val_dataset.get_dataset_size()):
+for i in range(test_dataset.get_dataset_size()):
     print("Image:", batch_filenames[i])
     print()
     print("Ground truth boxes:\n")
