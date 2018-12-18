@@ -19,16 +19,16 @@ from ssd_encoder_decoder.ssd_input_encoder import SSDInputEncoder
 
 
 def training_preprocessing(img_height, img_width, mean_color):
-    ssd_data_augmentation = SSDDataAugmentation(img_height=img_height,
-                                                img_width=img_width,
-                                                background=mean_color)
+    ssd_data_augmentation = SSDDataAugmentation(img_height = img_height,
+                                                img_width = img_width,
+                                                background = mean_color)
     return [ssd_data_augmentation]
 
 
 # For the validation generator:
 def val_preprocessing(img_height, img_width):
     convert_to_3_channels = ConvertTo3Channels()
-    resize = Resize(height=img_height, width=img_width)
+    resize = Resize(height = img_height, width = img_width)
     return [convert_to_3_channels, resize]
 
 
@@ -62,10 +62,10 @@ def main():
     # limit gpu usage
     config = tf.ConfigProto()
     config.gpu_options.per_process_gpu_memory_fraction = 0.8
-    set_session = tf.Session(config=config)
+    set_session = tf.Session(config = config)
 
     # parse args
-    parser = ConfigParser(interpolation=ExtendedInterpolation())
+    parser = ConfigParser(interpolation = ExtendedInterpolation())
     parser.read("model_config.ini")
     params = parser["ssd512_train"]
 
@@ -104,20 +104,20 @@ def main():
 
     K.clear_session()  # Clear previous models from memory.
 
-    model = ssd_512(image_size=(img_height, img_width, img_channels),
-                    n_classes=n_classes,
-                    mode='training',
-                    l2_regularization=0.0005,
-                    scales=scales,
-                    aspect_ratios_per_layer=aspect_ratios,
-                    two_boxes_for_ar1=two_boxes_for_ar1,
-                    steps=steps,
-                    offsets=offsets,
-                    clip_boxes=clip_boxes,
-                    variances=variances,
-                    normalize_coords=normalize_coords,
-                    subtract_mean=mean_color,
-                    swap_channels=swap_channels)
+    model = ssd_512(image_size = (img_height, img_width, img_channels),
+                    n_classes = n_classes,
+                    mode = 'training',
+                    l2_regularization = 0.0005,
+                    scales = scales,
+                    aspect_ratios_per_layer = aspect_ratios,
+                    two_boxes_for_ar1 = two_boxes_for_ar1,
+                    steps = steps,
+                    offsets = offsets,
+                    clip_boxes = clip_boxes,
+                    variances = variances,
+                    normalize_coords = normalize_coords,
+                    subtract_mean = mean_color,
+                    swap_channels = swap_channels)
 
     # 2: Load some weights into the model.
 
@@ -125,26 +125,26 @@ def main():
     # all weights stored under the weights directory
     weights_path = params["weights_path"]
 
-    model.load_weights(weights_path, by_name=True)
+    model.load_weights(weights_path, by_name = True)
 
     # 3: Instantiate an optimizer and the SSD loss function and compile the model.
     #    If you want to follow the original Caffe implementation, use the preset SGD
     #    optimizer, otherwise I'd recommend the commented-out Adam optimizer.
 
-    adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    adam = Adam(lr = 0.001, beta_1 = 0.9, beta_2 = 0.999, epsilon = 1e-08, decay = 0.0)
     # sgd = SGD(lr=0.001, momentum=0.9, decay=0.0, nesterov=False)
 
-    ssd_loss = SSDLoss(neg_pos_ratio=3, alpha=1.0)
+    ssd_loss = SSDLoss(neg_pos_ratio = 3, alpha = 1.0)
 
-    model.compile(optimizer=adam, loss=ssd_loss.compute_loss)
+    model.compile(optimizer = adam, loss = ssd_loss.compute_loss)
 
     # 1: Instantiate two `DataGenerator` objects: One for training, one for validation.
 
     # Optional: If you have enough memory, consider loading the images into memory or use hdf5 dataset.
 
-    train_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=None)
-    val_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=None)
-    test_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=None)
+    train_dataset = DataGenerator(load_images_into_memory = False, hdf5_dataset_path = None)
+    val_dataset = DataGenerator(load_images_into_memory = False, hdf5_dataset_path = None)
+    test_dataset = DataGenerator(load_images_into_memory = False, hdf5_dataset_path = None)
 
     # 2: Parse the image and label lists for the training and validation datasets. This can take a while.
 
@@ -162,52 +162,52 @@ def main():
     fire_test = os.path.join(fire_imagesets, 'test.txt')
     fire_val = os.path.join(fire_imagesets, 'val.txt')
 
-    train_dataset.parse_xml(images_dirs=[fire_img],
-                            image_set_filenames=[fire_train],
-                            annotations_dirs=[fire_annotation],
-                            classes=classes,
-                            include_classes='all',
-                            exclude_truncated=False,
-                            exclude_difficult=False,
-                            ret=False)
+    train_dataset.parse_xml(images_dirs = [fire_img],
+                            image_set_filenames = [fire_train],
+                            annotations_dirs = [fire_annotation],
+                            classes = classes,
+                            include_classes = 'all',
+                            exclude_truncated = False,
+                            exclude_difficult = False,
+                            ret = False)
 
-    val_dataset.parse_xml(images_dirs=[fire_img],
-                          image_set_filenames=[fire_val],
-                          annotations_dirs=[fire_annotation],
-                          classes=classes,
-                          include_classes='all',
-                          exclude_truncated=False,
-                          exclude_difficult=False,
-                          ret=False)
+    val_dataset.parse_xml(images_dirs = [fire_img],
+                          image_set_filenames = [fire_val],
+                          annotations_dirs = [fire_annotation],
+                          classes = classes,
+                          include_classes = 'all',
+                          exclude_truncated = False,
+                          exclude_difficult = False,
+                          ret = False)
 
-    test_dataset.parse_xml(images_dirs=[fire_img],
-                          image_set_filenames=[fire_test],
-                          annotations_dirs=[fire_annotation],
-                          classes=classes,
-                          include_classes='all',
-                          exclude_truncated=False,
-                          exclude_difficult=False,
-                          ret=False)
+    test_dataset.parse_xml(images_dirs = [fire_img],
+                           image_set_filenames = [fire_test],
+                           annotations_dirs = [fire_annotation],
+                           classes = classes,
+                           include_classes = 'all',
+                           exclude_truncated = False,
+                           exclude_difficult = False,
+                           ret = False)
 
     # Optional: Convert the dataset into an HDF5 dataset. This will require more disk space, but will
     # speed up the training. Doing this is not relevant in case you activated the `load_images_into_memory`
     # option in the constructor, because in that cas the images are in memory already anyway. If you don't
     # want to create HDF5 datasets, comment out the subsequent two function calls.
 
-    train_dataset.create_hdf5_dataset(file_path=params["hdf5_train_path"],
-                                      resize=False,
-                                      variable_image_size=True,
-                                      verbose=True)
+    train_dataset.create_hdf5_dataset(file_path = params["hdf5_train_path"],
+                                      resize = False,
+                                      variable_image_size = True,
+                                      verbose = True)
 
-    val_dataset.create_hdf5_dataset(file_path=params["hdf5_val_path"],
-                                    resize=False,
-                                    variable_image_size=True,
-                                    verbose=True)
+    val_dataset.create_hdf5_dataset(file_path = params["hdf5_val_path"],
+                                    resize = False,
+                                    variable_image_size = True,
+                                    verbose = True)
 
-    test_dataset.create_hdf5_dataset(file_path=params["hdf5_test_path"],
-                                    resize=False,
-                                    variable_image_size=True,
-                                    verbose=True)
+    test_dataset.create_hdf5_dataset(file_path = params["hdf5_test_path"],
+                                     resize = False,
+                                     variable_image_size = True,
+                                     verbose = True)
 
     # 3: Set the batch size.
 
@@ -219,39 +219,40 @@ def main():
 
     predictor_sizes = get_predictor_sizes(model)
 
-    ssd_input_encoder = SSDInputEncoder(img_height=img_height,
-                                        img_width=img_width,
-                                        n_classes=n_classes,
-                                        predictor_sizes=predictor_sizes,
-                                        scales=scales,
-                                        aspect_ratios_per_layer=aspect_ratios,
-                                        two_boxes_for_ar1=two_boxes_for_ar1,
-                                        steps=steps,
-                                        offsets=offsets,
-                                        clip_boxes=clip_boxes,
-                                        variances=variances,
-                                        matching_type='multi',
-                                        pos_iou_threshold=0.5,
-                                        neg_iou_limit=0.5,
-                                        normalize_coords=normalize_coords)
+    ssd_input_encoder = SSDInputEncoder(img_height = img_height,
+                                        img_width = img_width,
+                                        n_classes = n_classes,
+                                        predictor_sizes = predictor_sizes,
+                                        scales = scales,
+                                        aspect_ratios_per_layer = aspect_ratios,
+                                        two_boxes_for_ar1 = two_boxes_for_ar1,
+                                        steps = steps,
+                                        offsets = offsets,
+                                        clip_boxes = clip_boxes,
+                                        variances = variances,
+                                        matching_type = 'multi',
+                                        pos_iou_threshold = 0.5,
+                                        neg_iou_limit = 0.5,
+                                        normalize_coords = normalize_coords)
 
     # 6: Create the generator handles that will be passed to Keras' `fit_generator()` function.
 
-    train_generator = train_dataset.generate(batch_size=batch_size,
-                                             shuffle=True,
-                                             transformations=training_preprocessing(img_height, img_width, mean_color),
-                                             label_encoder=ssd_input_encoder,
-                                             returns={'processed_images',
-                                                      'encoded_labels'},
-                                             keep_images_without_gt=False)
+    train_generator = train_dataset.generate(batch_size = batch_size,
+                                             shuffle = True,
+                                             transformations = training_preprocessing(img_height, img_width,
+                                                                                      mean_color),
+                                             label_encoder = ssd_input_encoder,
+                                             returns = {'processed_images',
+                                                        'encoded_labels'},
+                                             keep_images_without_gt = False)
 
-    val_generator = val_dataset.generate(batch_size=batch_size,
-                                         shuffle=False,
-                                         transformations=val_preprocessing(img_height, img_width),
-                                         label_encoder=ssd_input_encoder,
-                                         returns={'processed_images',
-                                                  'encoded_labels'},
-                                         keep_images_without_gt=False)
+    val_generator = val_dataset.generate(batch_size = batch_size,
+                                         shuffle = False,
+                                         transformations = val_preprocessing(img_height, img_width),
+                                         label_encoder = ssd_input_encoder,
+                                         returns = {'processed_images',
+                                                    'encoded_labels'},
+                                         keep_images_without_gt = False)
 
     # Get the number of samples in the training and validations datasets.
     train_dataset_size = train_dataset.get_dataset_size()
@@ -265,28 +266,28 @@ def main():
     # TODO: Set the file path under which you want to save the model.
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M').split(" ")
     model_checkpoint = ModelCheckpoint(
-        filepath=os.path.join(params["checkpoint_path"],
-                              'ssd512_fire_{}_{}.h5'.format(current_time[0], current_time[1])),
-        monitor='val_loss',
-        verbose=1,
-        save_best_only=True,
-        save_weights_only=False,
-        mode='auto',
-        period=10)
+        filepath = os.path.join(params["checkpoint_path"],
+                                'ssd512_fire_{}_{}.h5'.format(current_time[0], current_time[1])),
+        monitor = 'val_loss',
+        verbose = 1,
+        save_best_only = True,
+        save_weights_only = False,
+        mode = 'auto',
+        period = 10)
     # model_checkpoint.best =
 
     csv_logger = CSVLogger(
-        filename=os.path.join(params["log_path"], 'ssd512_fire_{}_{}.csv'.format(current_time[0], current_time[1])),
-        separator=',',
-        append=True)
+        filename = os.path.join(params["log_path"], 'ssd512_fire_{}_{}.csv'.format(current_time[0], current_time[1])),
+        separator = ',',
+        append = True)
 
     # learning_rate_scheduler = LearningRateScheduler(schedule=lr_schedule, verbose=1)
 
     terminate_on_nan = TerminateOnNaN()
 
     tensorboard = TensorBoard(
-        log_dir=os.path.join(params["tensorboard_path"], 'ssd512', current_time[0], current_time[1]),
-        write_images=True, write_graph=True)
+        log_dir = os.path.join(params["tensorboard_path"], 'ssd512', current_time[0], current_time[1]),
+        write_images = True, write_graph = True)
 
     callbacks = [model_checkpoint,
                  csv_logger,
@@ -300,10 +301,14 @@ def main():
     final_epoch = int(params["epoch"])
     steps_per_epoch = int(params["steps_per_epoch"])
 
-    history = model.fit_generator(generator=train_generator,
-                                  steps_per_epoch=steps_per_epoch,
-                                  epochs=final_epoch,
-                                  callbacks=callbacks,
-                                  validation_data=val_generator,
-                                  validation_steps=ceil(val_dataset_size / batch_size),
-                                  initial_epoch=initial_epoch)
+    history = model.fit_generator(generator = train_generator,
+                                  steps_per_epoch = steps_per_epoch,
+                                  epochs = final_epoch,
+                                  callbacks = callbacks,
+                                  validation_data = val_generator,
+                                  validation_steps = ceil(val_dataset_size / batch_size),
+                                  initial_epoch = initial_epoch)
+
+
+if __name__ == '__main__':
+    main()
