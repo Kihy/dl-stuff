@@ -144,6 +144,7 @@ def main():
 
     train_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=None)
     val_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=None)
+    test_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=None)
 
     # 2: Parse the image and label lists for the training and validation datasets. This can take a while.
 
@@ -179,6 +180,15 @@ def main():
                           exclude_difficult=False,
                           ret=False)
 
+    test_dataset.parse_xml(images_dirs=[fire_img],
+                          image_set_filenames=[fire_test],
+                          annotations_dirs=[fire_annotation],
+                          classes=classes,
+                          include_classes='all',
+                          exclude_truncated=False,
+                          exclude_difficult=False,
+                          ret=False)
+
     # Optional: Convert the dataset into an HDF5 dataset. This will require more disk space, but will
     # speed up the training. Doing this is not relevant in case you activated the `load_images_into_memory`
     # option in the constructor, because in that cas the images are in memory already anyway. If you don't
@@ -189,7 +199,12 @@ def main():
                                       variable_image_size=True,
                                       verbose=True)
 
-    val_dataset.create_hdf5_dataset(file_path=params["hdf5_test_path"],
+    val_dataset.create_hdf5_dataset(file_path=params["hdf5_val_path"],
+                                    resize=False,
+                                    variable_image_size=True,
+                                    verbose=True)
+
+    test_dataset.create_hdf5_dataset(file_path=params["hdf5_test_path"],
                                     resize=False,
                                     variable_image_size=True,
                                     verbose=True)

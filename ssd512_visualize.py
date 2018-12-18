@@ -3,7 +3,7 @@ import matplotlib
 matplotlib.use("Agg")
 import os
 import numpy as np
-from ssd512_train import training_preprocessing, val_preprocessing, get_predictor_sizes
+from ssd512_train import training_preprocessing, val_preprocessing
 from configparser import ConfigParser, ExtendedInterpolation
 
 from matplotlib import pyplot as plt
@@ -13,12 +13,8 @@ from keras.models import load_model
 from keras_loss_function.keras_ssd_loss import SSDLoss
 from keras_layers.keras_layer_AnchorBoxes import AnchorBoxes
 from keras_layers.keras_layer_L2Normalization import L2Normalization
-from ssd_encoder_decoder.ssd_input_encoder import SSDInputEncoder
 from ssd_encoder_decoder.ssd_output_decoder import decode_detections
 from data_generator.object_detection_2d_data_generator import DataGenerator
-from data_generator.object_detection_2d_geometric_ops import Resize
-from data_generator.object_detection_2d_photometric_ops import ConvertTo3Channels
-from data_generator.data_augmentation_chain_original_ssd import SSDDataAugmentation
 from data_generator.object_detection_2d_misc_utils import apply_inverse_transforms
 
 parser = ConfigParser(interpolation=ExtendedInterpolation())
@@ -62,7 +58,6 @@ clip_boxes = bool(params["clip_boxes"])
 variances = loads(params["variances"])
 normalize_coords = bool(params["normalize_coords"])
 
-
 # The directories that contain the images.
 fire_img = params["image_path"]
 
@@ -76,49 +71,11 @@ fire_test = os.path.join(fire_imagesets, 'test.txt')
 fire_val = os.path.join(fire_imagesets, 'val.txt')
 classes = (loads(params["classes"]))
 
+test_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_test_path"],
+                             images_dir=fire_img, filenames=fire_test)
 
-test_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_test_path"], images_dir=fire_img, filenames=fire_test)
-
-train_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_train_path"], images_dir=fire_img, filenames=fire_train)
-
-# train_dataset.parse_xml(images_dirs=[fire_img],
-#                         image_set_filenames=[fire_train],
-#                         annotations_dirs=[fire_annotation],
-#                         classes=classes,
-#                         include_classes='all',
-#                         exclude_truncated=False,
-#                         exclude_difficult=False,
-#                         ret=False)
-#
-# val_dataset.parse_xml(images_dirs=[fire_img],
-#                       image_set_filenames=[fire_val],
-#                       annotations_dirs=[fire_anno],
-#                       classes=classes,
-#                       include_classes='all',
-#                       exclude_truncated=False,
-#                       exclude_difficult=True,
-#                       ret=False)
-
-
-
-# The encoder constructor needs the spatial dimensions of the model's predictor layers to create the anchor boxes.
-predictor_sizes = get_predictor_sizes(model)
-
-# ssd_input_encoder = SSDInputEncoder(img_height=img_height,
-#                                     img_width=img_width,
-#                                     n_classes=n_classes,
-#                                     predictor_sizes=predictor_sizes,
-#                                     scales=scales,
-#                                     aspect_ratios_per_layer=aspect_ratios,
-#                                     two_boxes_for_ar1=two_boxes_for_ar1,
-#                                     steps=steps,
-#                                     offsets=offsets,
-#                                     clip_boxes=clip_boxes,
-#                                     variances=variances,
-#                                     matching_type='multi',
-#                                     pos_iou_threshold=0.5,
-#                                     neg_iou_limit=0.5,
-#                                     normalize_coords=normalize_coords)
+train_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_train_path"],
+                              images_dir=fire_img, filenames=fire_train)
 
 # 1: Set the generator for the predictions.
 
@@ -127,10 +84,10 @@ predict_generator = test_dataset.generate(batch_size=test_dataset.get_dataset_si
                                           transformations=val_preprocessing(img_height, img_width),
                                           label_encoder=None,
                                           returns={'processed_images',
-                                                  'filenames',
-                                                  'inverse_transform',
-                                                  'original_images',
-                                                  'original_labels'},
+                                                   'filenames',
+                                                   'inverse_transform',
+                                                   'original_images',
+                                                   'original_labels'},
                                           keep_images_without_gt=False)
 train_batch_size = int(params["train_size"])
 data_generator = train_dataset.generate(batch_size=train_batch_size,
@@ -156,7 +113,6 @@ print("Number of images in the validation dataset:\t{:>6}".format(val_dataset_si
 batch_images, batch_filenames, batch_inverse_transforms, batch_original_images, batch_original_labels = next(
     predict_generator)
 
-print(batch_filenames)
 for i in range(test_dataset.get_dataset_size()):
     print("Image:", batch_filenames[i])
     print()
@@ -170,9 +126,8 @@ for i in range(test_dataset.get_dataset_size()):
     # 4: Decode the raw predictions in `y_pred`.
 
     y_pred_decoded = decode_detections(y_pred,
-
-                                       confidence_thresh=0.3,
-                                       iou_threshold=0.4,
+                                       confidence_thresh=float(params["confidence_thresh"]),
+                                       iou_threshold=float(params["iou_thresh"]),
                                        top_k=200,
                                        normalize_coords=normalize_coords,
                                        img_height=img_height,

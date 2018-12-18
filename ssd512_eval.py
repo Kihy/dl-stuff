@@ -3,7 +3,11 @@ from keras.models import load_model, Model
 from keras.optimizers import Adam
 from scipy.misc import imread
 import numpy as np
+from json import loads
+import os
 from matplotlib import pyplot as plt
+from ssd512_train import training_preprocessing, val_preprocessing
+from configparser import ConfigParser, ExtendedInterpolation
 
 from models.keras_ssd300 import ssd_300
 from keras_loss_function.keras_ssd_loss import SSDLoss
@@ -14,14 +18,25 @@ from keras_layers.keras_layer_L2Normalization import L2Normalization
 from data_generator.object_detection_2d_data_generator import DataGenerator
 from eval_utils.average_precision_evaluator import Evaluator
 
+
+parser = ConfigParser(interpolation=ExtendedInterpolation())
+parser.read("model_config.ini")
+params = parser["ssd512_eval"]
 # Set a few configuration parameters.
-img_height = 300
-img_width = 300
-n_classes = 1
+
+classes = (loads(params["classes"]))
+
+img_height = int(params["image_height"])  # Height of the model input images
+img_width = int(params["image_width"])  # Width of the model input images
+img_channels = int(params["img_channels"])  # Number of color channels of the model input images
+
+# Number of positive classes
+n_classes = len(classes) - 1
+
 model_mode = 'inference'
 
 # TODO: Set the path to the `.h5` file of the model to be loaded.
-model_path = 'saved_models/ssd300_fire_epoch-80_loss-3.7914_val_loss-3.7137.h5'
+model_path = params["model_path"]
 
 # We need to create an SSDLoss object in order to pass that to the model loader.
 ssd_loss = SSDLoss(neg_pos_ratio=3, alpha=1.0)
@@ -34,8 +49,8 @@ model = load_model(model_path, custom_objects={'AnchorBoxes': AnchorBoxes,
                                                'compute_loss': ssd_loss.compute_loss})
 m_input = model.input
 m_output = model.output
-decoded_predictions = DecodeDetections(confidence_thresh=0.5,
-                                       iou_threshold=0.45,
+decoded_predictions = DecodeDetections(confidence_thresh=float(params["confidence_thresh"]),
+                                       iou_threshold=float(params["iou_threshold"]),
                                        top_k=200,
                                        nms_max_output_size=400,
                                        coords='centroids',
@@ -46,25 +61,14 @@ decoded_predictions = DecodeDetections(confidence_thresh=0.5,
 
 model = Model(inputs=m_input, outputs=decoded_predictions)
 
-dataset = DataGenerator()
 
 # TODO: Set the paths to the dataset here.
-fire_dataset_images_dir = 'dataset/fire/JPEGImages/'
-fire_dataset_annotations_dir = 'dataset/fire/Annotations/'
-fire_dataset_image_set = 'dataset/fire/ImageSets/Main/test.txt'
+fire_dataset_images_dir = params["image_path"]
+fire_dataset_annotations_dir = params["annotations"]
+fire_dataset_image_set = os.path.join(params["image_sets"], 'test.txt')
 
-# The XML parser needs to now what object class names to look for and in which order to map them to integers.
-classes = ['background', 'fire']
-
-
-dataset.parse_xml(images_dirs=[fire_dataset_images_dir],
-                  image_set_filenames=[fire_dataset_image_set],
-                  annotations_dirs=[fire_dataset_annotations_dir],
-                  classes=classes,
-                  include_classes='all',
-                  exclude_truncated=False,
-                  exclude_difficult=False,
-                  ret=False)
+dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_test_path"],
+                             images_dir=fire_dataset_images_dir, filenames=fire_dataset_image_set)
 
 evaluator = Evaluator(model=model,
                       n_classes=n_classes,
@@ -87,6 +91,7 @@ results = evaluator(img_height=img_height,
                     return_average_precisions=True,
                     verbose=True)
 
+print("evaluating model: {} at {} confidence threshold and {} iou threshold".format(params["model_path"],params["iou_thresh"],params["confidence_thresh"]))
 
 mean_average_precision, average_precisions, precisions, recalls = results
 
