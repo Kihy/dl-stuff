@@ -3,7 +3,7 @@ import matplotlib
 matplotlib.use("Agg")
 import os
 import numpy as np
-from ssd512_train import training_preprocessing, val_preprocessing
+from ssd512_train import training_preprocessing, val_preprocessing, get_predictor_sizes
 from configparser import ConfigParser, ExtendedInterpolation
 
 from matplotlib import pyplot as plt
@@ -100,14 +100,7 @@ classes = (loads(params["classes"]))
 
 
 # The encoder constructor needs the spatial dimensions of the model's predictor layers to create the anchor boxes.
-predictor_sizes = [model.get_layer('conv4_3_norm_mbox_conf').output_shape[1:3],
-                   model.get_layer('fc7_mbox_conf').output_shape[1:3],
-                   model.get_layer('conv6_2_mbox_conf').output_shape[1:3],
-                   model.get_layer('conv7_2_mbox_conf').output_shape[1:3],
-                   model.get_layer('conv8_2_mbox_conf').output_shape[1:3],
-                   model.get_layer('conv9_2_mbox_conf').output_shape[1:3],
-                   model.get_layer('conv10_2_mbox_conf').output_shape[1:3]
-                   ]
+predictor_sizes = get_predictor_sizes()
 
 # ssd_input_encoder = SSDInputEncoder(img_height=img_height,
 #                                     img_width=img_width,

@@ -175,13 +175,17 @@ def val_preprocessing():
 # 5: Instantiate an encoder that can encode ground truth labels into the format needed by the SSD loss function.
 
 # The encoder constructor needs the spatial dimensions of the model's predictor layers to create the anchor boxes.
-predictor_sizes = [model.get_layer('conv4_3_norm_mbox_conf').output_shape[1:3],
+def get_predictor_sizes():
+    sizes = [model.get_layer('conv4_3_norm_mbox_conf').output_shape[1:3],
                    model.get_layer('fc7_mbox_conf').output_shape[1:3],
                    model.get_layer('conv6_2_mbox_conf').output_shape[1:3],
                    model.get_layer('conv7_2_mbox_conf').output_shape[1:3],
                    model.get_layer('conv8_2_mbox_conf').output_shape[1:3],
                    model.get_layer('conv9_2_mbox_conf').output_shape[1:3],
                    ]
+    return sizes
+
+predictor_sizes=get_predictor_sizes()
 
 ssd_input_encoder = SSDInputEncoder(img_height=img_height,
                                     img_width=img_width,
