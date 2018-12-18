@@ -62,9 +62,6 @@ clip_boxes = bool(params["clip_boxes"])
 variances = loads(params["variances"])
 normalize_coords = bool(params["normalize_coords"])
 
-val_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_test_path"])
-
-train_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_train_path"])
 
 # The directories that contain the images.
 fire_img = params["image_path"]
@@ -78,6 +75,11 @@ fire_train = os.path.join(fire_imagesets, 'train.txt')
 fire_test = os.path.join(fire_imagesets, 'test.txt')
 fire_val = os.path.join(fire_imagesets, 'val.txt')
 classes = (loads(params["classes"]))
+
+
+val_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_test_path"], filenames=[fire_test])
+
+train_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_train_path"], filenames=[fire_train])
 
 # train_dataset.parse_xml(images_dirs=[fire_img],
 #                         image_set_filenames=[fire_train],
