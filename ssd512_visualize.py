@@ -100,7 +100,7 @@ classes = (loads(params["classes"]))
 
 
 # The encoder constructor needs the spatial dimensions of the model's predictor layers to create the anchor boxes.
-predictor_sizes = get_predictor_sizes()
+predictor_sizes = get_predictor_sizes(model)
 
 # ssd_input_encoder = SSDInputEncoder(img_height=img_height,
 #                                     img_width=img_width,
@@ -122,7 +122,7 @@ predictor_sizes = get_predictor_sizes()
 
 predict_generator = val_dataset.generate(batch_size=val_dataset.get_dataset_size(),
                                          shuffle=True,
-                                         transformations=val_preprocessing(),
+                                         transformations=val_preprocessing(img_height, img_width),
                                          label_encoder=None,
                                          returns={'processed_images',
                                                   'filenames',
@@ -133,7 +133,7 @@ predict_generator = val_dataset.generate(batch_size=val_dataset.get_dataset_size
 train_batch_size = int(params["train_size"])
 data_generator = train_dataset.generate(batch_size=train_batch_size,
                                         shuffle=True,
-                                        transformations=training_preprocessing(),
+                                        transformations=training_preprocessing(img_height, img_width, mean_color),
                                         label_encoder=None,
                                         returns={'processed_images',
                                                  'processed_labels',
