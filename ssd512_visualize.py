@@ -154,7 +154,7 @@ print("Number of images in the validation dataset:\t{:>6}".format(val_dataset_si
 batch_images, batch_filenames, batch_inverse_transforms, batch_original_images, batch_original_labels = next(
     predict_generator)
 
-
+print(len(batch_filenames))
 for i in range(val_dataset.get_dataset_size()):
     print("Image:", batch_filenames[i])
     print()
