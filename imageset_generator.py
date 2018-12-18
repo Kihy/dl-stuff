@@ -40,7 +40,7 @@ filenames = [splitext(f)[0] for f in listdir(IMAGE_PATH)]
 num_file = len(filenames)
 train_cutoff = int(train_prob * num_file)
 val_cutoff = int((train_prob + val_prob) * num_file)
-
+print("numfile: {}, train_cutoff: {}, val_cutoff: {}".format(num_file, train_cutoff,val_cutoff))
 random.shuffle(filenames)
 
 # open files
