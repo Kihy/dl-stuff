@@ -62,17 +62,15 @@ normalize_coords = bool(params["normalize_coords"])
 fire_img = params["image_path"]
 
 # The directories that contain the annotations.
-fire_annotation = params["annotations"]
-
+# fire_annotation = params["annotations"]
+#
 # The paths to the image sets.
 fire_imagesets = params["image_sets"]
-fire_train = os.path.join(fire_imagesets, 'train.txt')
-fire_test = os.path.join(fire_imagesets, 'test.txt')
-fire_val = os.path.join(fire_imagesets, 'val.txt')
+file_names=params["image_names"]
 classes = (loads(params["classes"]))
 
 test_dataset = DataGenerator(load_images_into_memory=False,
-                             images_dir=fire_img)
+                             images_dir=fire_img, filenames=file_names)
 
 # 1: Set the generator for the predictions.
 
