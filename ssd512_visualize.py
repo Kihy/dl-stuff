@@ -173,13 +173,13 @@ for i in range(test_dataset.get_dataset_size()):
         current_axis.add_patch(
             plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, color=color, fill=False, linewidth=2))
         current_axis.text(xmin, ymin, label, size='x-large', color='white', bbox={'facecolor': color, 'alpha': 1.0})
-    plt.savefig('saved_figures/{}'.format(batch_filenames[i].split("/")[-1]))
+    plt.savefig('saved_figures/output/{}'.format(batch_filenames[i].split("/")[-1]))
 
 # input samples
 
 processed_images, processed_annotations, filenames, original_images, original_annotations = next(data_generator)
 
-for i in range(train_batch_size):
+for i in range(batch_size):
     colors = plt.cm.hsv(np.linspace(0, 1, len(classes))).tolist()  # Set the colors for the bounding boxes
 
     fig, cell = plt.subplots(1, 2, figsize=(20, 16))
