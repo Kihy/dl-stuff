@@ -17,6 +17,11 @@ from ssd_encoder_decoder.ssd_output_decoder import decode_detections
 from data_generator.object_detection_2d_data_generator import DataGenerator
 from data_generator.object_detection_2d_misc_utils import apply_inverse_transforms
 
+#remove previous figures
+for i in os.listdir("saved_figures/custom"):
+    os.remove(os.path.join("saved_figures/custom", i))
+
+
 parser = ConfigParser(interpolation=ExtendedInterpolation())
 parser.read("model_config.ini")
 params = parser["ssd512_custom"]

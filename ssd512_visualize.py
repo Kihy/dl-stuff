@@ -17,6 +17,14 @@ from ssd_encoder_decoder.ssd_output_decoder import decode_detections
 from data_generator.object_detection_2d_data_generator import DataGenerator
 from data_generator.object_detection_2d_misc_utils import apply_inverse_transforms
 
+
+# remove previous files
+for i in os.listdir("saved_figures/input"):
+    os.remove(os.path.join("saved_figures/input", i))
+
+for i in os.listdir("saved_figures/output"):
+    os.remove(os.path.join("saved_figures/output", i))
+
 parser = ConfigParser(interpolation=ExtendedInterpolation())
 parser.read("model_config.ini")
 params = parser["ssd512_visualize"]
