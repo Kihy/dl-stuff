@@ -76,7 +76,22 @@ test_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=pa
 
 train_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_train_path"],
                               images_dir=fire_img, filenames=fire_train)
-
+train_dataset.parse_xml(images_dirs = [fire_img],
+                        image_set_filenames = [fire_train],
+                        annotations_dirs = [fire_annotation],
+                        classes = classes,
+                        include_classes = 'all',
+                        exclude_truncated = False,
+                        exclude_difficult = False,
+                        ret = False)
+test_dataset.parse_xml(images_dirs = [fire_img],
+                       image_set_filenames = [fire_test],
+                       annotations_dirs = [fire_annotation],
+                       classes = classes,
+                       include_classes = 'all',
+                       exclude_truncated = False,
+                       exclude_difficult = False,
+                       ret = False)
 # 1: Set the generator for the predictions.
 batch_size = int(params["train_size"])
 predict_generator = test_dataset.generate(batch_size=batch_size,
