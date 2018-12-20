@@ -70,7 +70,6 @@ fire_train = os.path.join(fire_imagesets, 'train.txt')
 fire_test = os.path.join(fire_imagesets, 'test.txt')
 fire_val = os.path.join(fire_imagesets, 'val.txt')
 classes = (loads(params["classes"]))
-
 test_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=params["hdf5_test_path"],
                              images_dir=fire_img, filenames=fire_test)
 
