@@ -142,5 +142,5 @@ for i in range(test_dataset.get_dataset_size()):
         current_axis.add_patch(
             plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, color=color, fill=False, linewidth=2))
         current_axis.text(xmin, ymin, label, size='x-large', color='white', bbox={'facecolor': color, 'alpha': 1.0})
-    plt.savefig('saved_figures/{}'.format(batch_filenames[i].split("/")[-1]))
+    plt.savefig('saved_figures/custom/{}'.format(batch_filenames[i].split("/")[-1]))
 
