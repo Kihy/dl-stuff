@@ -78,8 +78,8 @@ train_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=p
                               images_dir=fire_img, filenames=fire_train)
 
 # 1: Set the generator for the predictions.
-
-predict_generator = test_dataset.generate(batch_size=test_dataset.get_dataset_size(),
+batch_size = int(params["train_size"])
+predict_generator = test_dataset.generate(batch_size=batch_size,
                                           shuffle=True,
                                           transformations=val_preprocessing(img_height, img_width),
                                           label_encoder=None,
@@ -89,8 +89,8 @@ predict_generator = test_dataset.generate(batch_size=test_dataset.get_dataset_si
                                                    'original_images',
                                                    'original_labels'},
                                           keep_images_without_gt=False)
-train_batch_size = int(params["train_size"])
-data_generator = train_dataset.generate(batch_size=train_batch_size,
+
+data_generator = train_dataset.generate(batch_size=batch_size,
                                         shuffle=True,
                                         transformations=training_preprocessing(img_height, img_width, mean_color),
                                         label_encoder=None,
