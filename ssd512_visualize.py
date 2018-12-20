@@ -86,8 +86,9 @@ train_dataset = DataGenerator(load_images_into_memory=False, hdf5_dataset_path=p
 
 
 # 1: Set the generator for the predictions.
-batch_size = int(params["train_size"])
-predict_generator = test_dataset.generate(batch_size=batch_size,
+train_size = int(params["view_train"])
+test_size=int(params["view_test"])
+predict_generator = test_dataset.generate(batch_size=test_size,
                                           shuffle=True,
                                           transformations=val_preprocessing(img_height, img_width),
                                           label_encoder=None,
@@ -98,7 +99,7 @@ predict_generator = test_dataset.generate(batch_size=batch_size,
                                                    'original_labels'},
                                           keep_images_without_gt=False)
 
-data_generator = train_dataset.generate(batch_size=batch_size,
+data_generator = train_dataset.generate(batch_size=train_size,
                                         shuffle=True,
                                         transformations=training_preprocessing(img_height, img_width, mean_color),
                                         label_encoder=None,
@@ -111,17 +112,10 @@ data_generator = train_dataset.generate(batch_size=batch_size,
 
 # 2: Generate samples.
 
-# Get the number of samples in the training and validations datasets.
-train_dataset_size = train_dataset.get_dataset_size()
-val_dataset_size = test_dataset.get_dataset_size()
-
-print("Number of images in the training dataset:\t{:>6}".format(train_dataset_size))
-print("Number of images in the validation dataset:\t{:>6}".format(val_dataset_size))
-
 batch_images, batch_filenames, batch_inverse_transforms, batch_original_images, batch_original_labels = next(
     predict_generator)
 
-for i in range(test_dataset.get_dataset_size()):
+for i in range(test_size):
     print("Image:", batch_filenames[i])
     print()
     print("Ground truth boxes:\n")
@@ -186,7 +180,7 @@ for i in range(test_dataset.get_dataset_size()):
 
 processed_images, processed_annotations, filenames, original_images, original_annotations = next(data_generator)
 
-for i in range(batch_size):
+for i in range(train_size):
     colors = plt.cm.hsv(np.linspace(0, 1, len(classes))).tolist()  # Set the colors for the bounding boxes
 
     fig, cell = plt.subplots(1, 2, figsize=(20, 16))
